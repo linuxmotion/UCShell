@@ -1,0 +1,15 @@
+	
+*	
+**
+** Welcome to UCShell 
+**
+*
+This is a simple shell programm written by John Weyrauch
+This shell functions in much the same way Bash does. 
+It allows acces to general system wide programs.
+
+Type 'exit' to exit the program.
+Commands such as ls works, as well as their arguments
+Shell does reports command errors to the user.
+
+
