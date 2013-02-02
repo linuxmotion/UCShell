@@ -6,12 +6,10 @@
  */
 
 #include "UCShell.h"
-#include <iostream>
 #include <sys/wait.h>
 #include <vector>
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <cstdio>
 
 using std::cin;
 using std::cout;

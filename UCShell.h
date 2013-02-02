@@ -10,23 +10,24 @@
 
 #include "UCShell.h"
 #include "SimpleGLibPipe.h"
-#include <iostream>
-#include <sys/wait.h>
-#include <vector>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
-using std::cin;
-using std::cout;
-using std::endl;
+// Include common to all sunclasses
+// of this main shell
+#include <vector>
+#include <iostream>
+#include <string.h>
+
+
 using std::vector;
 using std::string;
 
 // Comment this out to disable debuging
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
+
+using std::cout;
+using std::endl;
 #define log(String) \
 		cout << __FILE__ << "::"<< __FUNCTION__ << "::"<< __LINE__ << " " << String << endl;
 #else

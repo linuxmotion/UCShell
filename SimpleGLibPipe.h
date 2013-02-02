@@ -10,7 +10,7 @@
 
 
 #include <unistd.h>
-#include <cstdio>
+
 
 class SimpleGlibPipe{
 
@@ -39,23 +39,43 @@ public:
 
 
 	int getWritePipe(){
+
+		if(mOpenPipes[1] < 0){
+			return -1;
+		}
+
 		return mPipes[1];
 	}
 
 	int getReadPipe(){
+		if(mOpenPipes[0] < 0){
+					return -1;
+		}
 		return mPipes[0];
 	}
 
 
-	void writeToPipe(){
+	bool setwritePipe(int fd){
+		if(mOpenPipes[1] < 0){
+					return false;
+		}
 
+		dup2(getWritePipe(), fd);
+
+
+		return true;
 
 	}
 
-	void readFromPipe(){
+	bool setReadPipe(int fd){
+		if(mOpenPipes[0] < 0){
+			return false;
+		}
+
+		dup2(getReadPipe(), fd);
 
 
-
+		return true;
 	}
 
 	void reopenPipe() throw(int){

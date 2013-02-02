@@ -7,11 +7,9 @@
 
 #include "UCShellPipes.h"
 #include "SimpleGLibPipe.h"
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-
 #include <cstdio>
+#include <fcntl.h>
+#include <stdlib.h>
 
 UCShellPipes::UCShellPipes(): mInPipeMode(false), mInRedirectionMode(false) {
 
@@ -148,15 +146,15 @@ bool UCShellPipes::handlePipe(vector<string>& leftHandSide,
 
 	try {
 
+
 		log("creating a pipe for " << leftHandSide[0] << " | " << rightHandSide[0]);
-		int Pipes[2];
-		pipe(Pipes);
+		SimpleGlibPipe myPipe;
 
 		pid_t kidpid = fork(); // we entered a command, fork
 		if (kidpid) {
 			log("Connecting to pipe for " << leftHandSide[0]);
-			dup2(Pipes[1],  STDOUT_FILENO);
-			close(Pipes[0]);
+			myPipe.setwritePipe(STDOUT_FILENO);
+			myPipe.closeReadPipe();
 			vector<string>Tokens = leftHandSide;
 			executeSingleCommand(Tokens);
 			//we should never reach here
@@ -165,8 +163,8 @@ bool UCShellPipes::handlePipe(vector<string>& leftHandSide,
 
 			log("Connecting from pipe for " << rightHandSide[0]);
 
-			dup2(Pipes[0],  STDIN_FILENO);
-			close(Pipes[1]);
+			myPipe.setReadPipe(STDIN_FILENO);
+			myPipe.closeWritePipe();
 			vector<string>Tokens = rightHandSide;
 			executeSingleCommand(Tokens);
 
@@ -181,7 +179,7 @@ bool UCShellPipes::handlePipe(vector<string>& leftHandSide,
 
 
 	} catch (int ex) {
-
+		perror("Internal error: could not create pipe.");
 		return false;
 	}
 
