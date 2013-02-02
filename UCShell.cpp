@@ -142,6 +142,10 @@ bool UCShell::parentExecutionAfterFork(pid_t kidpid, vector<string> Tokens, bool
 	return true;
 }
 
+
+/**
+ * Start the execution of the program in the child process
+ */
 void UCShell::startChildExecution(const vector<string>& Tokens) {
 	//  i am in the child process
 	log("Child process started at " << __TIME__);

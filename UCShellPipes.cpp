@@ -11,22 +11,10 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
-UCShellPipes::UCShellPipes(): mInPipeMode(false), mInRedirectionMode(false) {
+UCShellPipes::UCShellPipes() {
 
 }
 
-void UCShellPipes::setPipeModeOn(){
-	mInPipeMode = true;
-	mInRedirectionMode = ! mInPipeMode;
-}
-void UCShellPipes::setRedirectModeOn(){
-	mInPipeMode = false;
-	mInRedirectionMode = ! mInPipeMode;
-}
-void UCShellPipes::setRedirectModeoFF(){
-	mInPipeMode = false;
-	mInRedirectionMode = mInPipeMode;
-}
 
 
 void UCShellPipes::startChildExecution(const vector<string>& Tokens){
@@ -41,28 +29,22 @@ void UCShellPipes::startChildExecution(const vector<string>& Tokens){
 
 		if(Tokens[i] == ">>"){
 			log(">>")
-			rightHandSide = vector<string>(++bter, eter);
-			if(handleRightCatRedirect(leftHandSide, rightHandSide))
-				exit(EXIT_SUCCESS);
-			else
-				exit(EXIT_FAILURE);
+					rightHandSide = vector<string>(++bter, eter);
+			handleRightCatRedirect(leftHandSide, rightHandSide);
+			exit(EXIT_FAILURE);
 
 		}
 		if(Tokens[i] == "<"){
 			log("<")
-			rightHandSide = vector<string>(++bter, eter);
-			if(handleLeftRedirect(leftHandSide, rightHandSide))
-				exit(EXIT_SUCCESS);
-			else
-				exit(EXIT_FAILURE);
+					rightHandSide = vector<string>(++bter, eter);
+			handleLeftRedirect(leftHandSide, rightHandSide);
+			exit(EXIT_FAILURE);
 		}
 		if(Tokens[i] == ">"){
 			log(">")
-			rightHandSide= vector<string>(++bter, eter);
-			if(handleRightRedirect(leftHandSide, rightHandSide))
-				exit(EXIT_SUCCESS);
-			else
-				exit(EXIT_FAILURE);
+					rightHandSide= vector<string>(++bter, eter);
+			handleRightRedirect(leftHandSide, rightHandSide);
+			exit(EXIT_FAILURE);
 		}
 		if(Tokens[i] == "|"){
 			rightHandSide = vector<string>(++bter, eter);
@@ -80,18 +62,49 @@ void UCShellPipes::startChildExecution(const vector<string>& Tokens){
 
 }
 
+/**
+ * The function should never return
+ */
 bool UCShellPipes::handleLeftRedirect(vector<string>& leftHandSide,
 		vector<string>& rightHandSide){
+	log("Redirecting from " << rightHandSide[0] << " into " << leftHandSide[0] )
+				char * st = new char[BUFFER_SIZE];
+	strcpy(st,mCurrentDir);
+	strcat(st, "/");
+	strcat(st, rightHandSide[0].c_str());
+	int file = open(st, O_RDONLY);
+	log("Opened redirection pipe to " << st)
+	if(file < 0){
+		perror("I/O Error: Failed to get a valid file descriptor");
+		return false;
+	}
 
-	return true;
+
+	log("Connecting the input stream to " << leftHandSide[0])
+	//Now we redirect standard output to the file using dup2
+	dup2(file,STDIN_FILENO);
+
+	//close(file,STDOUT_FILENO)
+
+	log("Redirecting the contents of " << rightHandSide[0].c_str() )
+	//Now standard in has been redirected, we can
+	// execute the program
+	vector<string>Tokens = leftHandSide;
+	executeSingleCommand(Tokens);
+
+	return false;
 
 }
-
+/**
+ * Redirects STDOUT and concatenates the file in rightHandSide[0].
+ * The function should not return, if it does then
+ * redirection was unsuccessful
+ */
 bool UCShellPipes::handleRightCatRedirect(vector<string>& leftHandSide,
 		vector<string>& rightHandSide){
 	//First, we're going to open a file
 	log("Redirecting to " << rightHandSide[0])
-	char * st = new char[BUFFER_SIZE];
+			char * st = new char[BUFFER_SIZE];
 	strcpy(st,mCurrentDir);
 	strcat(st, "/");
 	strcat(st, rightHandSide[0].c_str());
@@ -113,9 +126,13 @@ bool UCShellPipes::handleRightCatRedirect(vector<string>& leftHandSide,
 	executeSingleCommand(Tokens);
 	return false;
 
-	return true;
 
 }
+/**
+ * Redirects STDOUT to the file in rightHandSide[0].
+ * The function should not return, if it does then
+ * redirection was unsuccessful
+ */
 bool UCShellPipes::handleRightRedirect(vector<string>& leftHandSide,
 		vector<string>& rightHandSide){
 
@@ -123,7 +140,7 @@ bool UCShellPipes::handleRightRedirect(vector<string>& leftHandSide,
 	//pipe(Pipes);
 	//First, we're going to open a file
 	log("Redirecting to " << rightHandSide[0])
-	char * st = new char[BUFFER_SIZE];
+			char * st = new char[BUFFER_SIZE];
 	strcpy(st,mCurrentDir);
 	strcat(st, "/");
 	strcat(st, rightHandSide[0].c_str());
@@ -163,8 +180,6 @@ bool UCShellPipes::handlePipe(vector<string>& leftHandSide,
 			myPipe.closeReadPipe();
 			vector<string>Tokens = leftHandSide;
 			executeSingleCommand(Tokens);
-			//we should never reach here
-			return true;
 		} else if (kidpid == 0) {
 
 			log("Connecting from pipe for " << rightHandSide[0]);
@@ -178,7 +193,7 @@ bool UCShellPipes::handlePipe(vector<string>& leftHandSide,
 			// some error must have occurred
 			perror("Internal error: could not fork process.");
 			log("Error creating process");
-			return false;
+
 		}
 
 
@@ -186,16 +201,15 @@ bool UCShellPipes::handlePipe(vector<string>& leftHandSide,
 
 	} catch (int ex) {
 		perror("Internal error: could not create pipe.");
-		return false;
+
 	}
 
-	return true;
+	return false;
 
 
 }
 
 
 UCShellPipes::~UCShellPipes() {
-	// TODO Auto-generated destructor stub
 }
 

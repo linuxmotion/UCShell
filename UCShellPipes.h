@@ -17,11 +17,6 @@ using std::string;
 
 class UCShellPipes : public UCShell{
 protected:
-	bool mInPipeMode;
-	bool mInRedirectionMode;
-	void setPipeModeOn();
-	void setRedirectModeOn();
-	void setRedirectModeoFF();
 
 	bool handleRightCatRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handleLeftRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
