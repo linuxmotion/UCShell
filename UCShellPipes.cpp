@@ -38,14 +38,7 @@ void UCShellPipes::startChildExecution(const vector<string>& Tokens){
 
 	for(int i = 0; bter < eter; i++, bter++ ){
 
-		if(Tokens[i] == "<<"){
-			log("<<")
-			rightHandSide = vector<string>(++bter, eter);
-			if(handleLeftCatRedirect(leftHandSide, rightHandSide))
-				exit(EXIT_SUCCESS);
-			else
-				exit(EXIT_FAILURE);
-		}
+
 		if(Tokens[i] == ">>"){
 			log(">>")
 			rightHandSide = vector<string>(++bter, eter);
@@ -87,25 +80,38 @@ void UCShellPipes::startChildExecution(const vector<string>& Tokens){
 
 }
 
-bool UCShellPipes::handleLeftCatRedirect(vector<string>& leftHandSide,
-		vector<string>& rightHandSide){
-
-
-
-
-	return true;
-
-
-}
-bool UCShellPipes::handleRightCatRedirect(vector<string>& leftHandSide,
-		vector<string>& rightHandSide){
-
-
-	return true;
-
-}
 bool UCShellPipes::handleLeftRedirect(vector<string>& leftHandSide,
 		vector<string>& rightHandSide){
+
+	return true;
+
+}
+
+bool UCShellPipes::handleRightCatRedirect(vector<string>& leftHandSide,
+		vector<string>& rightHandSide){
+	//First, we're going to open a file
+	log("Redirecting to " << rightHandSide[0])
+	char * st = new char[BUFFER_SIZE];
+	strcpy(st,mCurrentDir);
+	strcat(st, "/");
+	strcat(st, rightHandSide[0].c_str());
+	int file = open(st, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
+	log("Opened redirection pipe to " << st)
+	//if(file < 0)
+	//	return 1;
+
+	log("Setting the output")
+	//Now we redirect standard output to the file using dup2
+	dup2(file,STDOUT_FILENO);
+
+	//close(file,STDOUT_FILENO)
+
+	log("Redirecting " << rightHandSide[0].c_str() )
+	//Now standard out has been redirected, we can write to
+	// the file
+	vector<string>Tokens = leftHandSide;
+	executeSingleCommand(Tokens);
+	return false;
 
 	return true;
 
@@ -121,7 +127,7 @@ bool UCShellPipes::handleRightRedirect(vector<string>& leftHandSide,
 	strcpy(st,mCurrentDir);
 	strcat(st, "/");
 	strcat(st, rightHandSide[0].c_str());
-	int file = open(st, O_WRONLY | O_CREAT);
+	int file = open(st, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	log("Opened redirection pipe to " << st)
 	//if(file < 0)
 	//	return 1;

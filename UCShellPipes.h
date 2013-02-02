@@ -23,7 +23,6 @@ protected:
 	void setRedirectModeOn();
 	void setRedirectModeoFF();
 
-	bool handleLeftCatRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handleRightCatRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handleLeftRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handleRightRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);

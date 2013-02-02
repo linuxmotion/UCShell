@@ -22,7 +22,7 @@ using std::vector;
 using std::string;
 
 // Comment this out to disable debuging
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 
