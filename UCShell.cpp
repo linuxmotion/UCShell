@@ -24,35 +24,6 @@ UCShell::UCShell() {
 }
 
 
-
-/**
- * Executes a single command using execvp().
- * Handles the tilde and dot expansion.
- * Exits with EXIT_FAILURE if execvp fails
- *
- */
-void UCShell::singleExecution(const vector<string>& Tokens, char* cwd) {
-	char** arg = stripArgs(Tokens);
-	string unExpandedCommandToken = Tokens[0];
-	const char *command;
-	string expansion = handleDotandTilde(Tokens[0], cwd);
-	// There was an expansion
-	if(expansion != ""){
-		command = expansion.c_str();
-	}
-	else{
-		command = unExpandedCommandToken.c_str();
-	}
-
-	// execute the command in Tokens
-	log("Executing command " << command  << " at " __TIME__)
-	int status = execvp(command, arg);
-	log("execvp failure has occured")
-	printf("The command %s failed with\n %s", command,  strerror(status));
-	// Say that we exited
-	exit(EXIT_FAILURE);
-}
-
 /**
  * Extracts the global tokens when the shell starts
  */
@@ -85,7 +56,7 @@ void UCShell::extractLocalTokens(char* buffer, vector<string>& Tokens) {
 }
 
 void UCShell::executeSingleCommand(const vector<string>& Tokens) {
-	char** arg = UCShell::stripArgs(Tokens);
+	char** arg = stripArgs(Tokens);
 	string unExpandedCommandToken = Tokens[0];
 	const char* command;
 	string expansion = handleDotandTilde(Tokens[0], mCurrentDir);
@@ -99,7 +70,7 @@ void UCShell::executeSingleCommand(const vector<string>& Tokens) {
 	log("Executing command " << command << " at " __TIME__)
 	int status = execvp(command, arg);
 	log("execvp failure has occured")
-	printf("The command %s failed with\n %s", command, strerror(status));
+	fprintf(stderr, "The command %s failed with\n%s\n", command, strerror(status));
 	// Say that we exited
 	exit(EXIT_FAILURE);
 }
@@ -149,7 +120,7 @@ bool UCShell::parentExecutionAfterFork(pid_t kidpid, vector<string> Tokens, bool
 void UCShell::startChildExecution(const vector<string>& Tokens) {
 	//  i am in the child process
 	log("Child process started at " << __TIME__);
-	singleExecution(Tokens, mCurrentDir);
+	executeSingleCommand(Tokens);
 }
 
 /**
@@ -233,6 +204,7 @@ int UCShell::StartShell(int argc, char* argv[]) {
 
 		if(!startExecution(Tokens))
 			return -EXIT_FAILURE;
+
 
 	}while(true);
 

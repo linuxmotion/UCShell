@@ -13,3 +13,6 @@ Commands such as ls works, as well as their arguments
 Shell does reports command errors to the user.
 
 
+**2-5-2013**
+Adds redirection
+

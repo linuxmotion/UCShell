@@ -1,4 +1,6 @@
 *.o
 *.d
 Debug/*
-tmp
+tmp*
+err*
+CS100HW-04.tar.gz

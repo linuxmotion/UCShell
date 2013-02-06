@@ -18,11 +18,13 @@ using std::string;
 class UCShellPipes : public UCShell{
 protected:
 
+	bool handleSTDErrRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handleRightCatRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handleLeftRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handleRightRedirect(vector<string>& leftHandSide, vector<string>& rightHandSide);
 	bool handlePipe(vector<string>& leftHandSide, vector<string>& rightHandSide);
 
+	vector<vector<string> >  stripPipes(const vector<string>& Tokens);
 
 	virtual void startChildExecution(const vector<string>& Tokens);
 

@@ -28,6 +28,7 @@ using std::string;
 
 using std::cout;
 using std::endl;
+using std::cerr;
 #define log(String) \
 		cout << __FILE__ << "::"<< __FUNCTION__ << "::"<< __LINE__ << " " << String << endl;
 #else
@@ -48,7 +49,6 @@ private:
 	void presentCommandPrompt(vector<string>& Tokens);
 	// Execution functions
 	bool startExecution(const vector<string>& Tokens);
-	void singleExecution(const vector<string>& Tokens, char* cwd);
 	bool parentExecutionAfterFork(pid_t kidpid, vector<string> Tokens, bool wait);
 
 protected:
